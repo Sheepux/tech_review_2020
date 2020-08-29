@@ -1,0 +1,50 @@
+version: "3.6"
+services:
+  database:
+    build:
+      context: docker/postgresql/
+      dockerfile: DockerFile
+    image: sheep/tech_review_2020:postgresql_12
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      KEYCLOAK_DB_NAME: ${KEYCLOAK_DB_NAME}
+      KEYCLOAK_DB_USER: ${KEYCLOAK_DB_USER}
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+    ports:
+      - "5432"
+  keycloak:
+    image: jboss/keycloak
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: database
+      DB_DATABASE: ${KEYCLOAK_DB_NAME}
+      DB_SCHEMA: public
+      DB_USER: ${KEYCLOAK_DB_USER}
+      DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      KEYCLOAK_USER: ${KEYCLOAK_USER}
+      KEYCLOAK_PASSWORD: ${KEYCLOAK_PASSWORD}
+    ports:
+      - 8081:8080
+    depends_on:
+      - database
+  graphql-engine:
+    image: hasura/graphql-engine:v1.2.2
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+      - keycloak
+    restart: always
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/postgres
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      # available from http://locahost:8081/auth/realms/{realm}/.well-known/openid-configuration
+      HASURA_GRAPHQL_JWT_SECRET: '{"jwk_url": "http://keycloak:8080/auth/realms/starter/protocol/openid-connect/certs","claims_namespace_path":"$$","claims_format":"json"}'
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+volumes:
+  db_data:
