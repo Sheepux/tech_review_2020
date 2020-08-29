@@ -2,6 +2,8 @@
 
 Tech review of deno/hasura/keycloack/kongHQ on a kubernetes cluster
 
+![alt text](https://github.com/sheepux/tech_review_2020/raw/master/doc/archi_poc.png "POC architecture")
+
 ## 🔖 Web sources
 
 https://khaja.dev/posts/a-sane-starter-for-rapid-prototyping/
