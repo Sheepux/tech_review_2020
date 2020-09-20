@@ -1,0 +1,28 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Format",
+        "type": "shell",
+        "command": "deno",
+        "args": [
+          "fmt"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Run (-A)",
+        "type": "shell",
+        "command": "deno",
+        "args": [
+          "run",
+          "--unstable",
+          "-A",
+          ".\\app.ts"
+        ],
+        "problemMatcher": []
+      }
+    ]
+}
